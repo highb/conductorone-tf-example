@@ -13,13 +13,13 @@ Example Terraform configuration for managing a ConductorOne app using the [Condu
 
    ```hcl
    provider "conductorone" {
-     server_url    = "https://<your-tenant>.conductor.one"
+     server_url    = "https://C1_API_ENDPOINT_WITH_PORT"
      client_id     = "" # or set CONDUCTORONE_CLIENT_ID
      client_secret = "" # or set CONDUCTORONE_CLIENT_SECRET
    }
    ```
 
-   Replace `<your-tenant>` with your actual tenant subdomain. You can find this in the ConductorOne admin UI URL.
+   Replace `C1_API_ENDPOINT_WITH_PORT` with your actual ConductorOne API endpoint and port (e.g. `your-tenant.conductor.one`).
 
 2. **Set credentials** via environment variables (recommended) so they stay out of version control:
 

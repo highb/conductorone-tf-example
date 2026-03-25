@@ -8,7 +8,7 @@ terraform {
 }
 
 provider "conductorone" {
-  server_url    = "https://c1dev.highb.d2.ductone.com:2443"
+  server_url    = "https://C1_API_ENDPOINT_WITH_PORT"
   client_id     = "" # or set CONDUCTORONE_CLIENT_ID
   client_secret = "" # or set CONDUCTORONE_CLIENT_SECRET
 }
