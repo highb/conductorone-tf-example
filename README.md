@@ -135,13 +135,16 @@ To test a branch or a PR from a fork, `git checkout` the relevant ref (or add th
 
 ### From a remote GitHub branch via `go install`
 
-Terraform itself has no Git source for providers, but `go install` will fetch and build any branch or commit in one step:
+Terraform itself has no Git source for providers, but `go install` will fetch and build a commit or simple branch name in one step:
 
 ```bash
-GOBIN=$(pwd)/bin go install github.com/conductorone/terraform-provider-conductorone@<branch-or-sha>
+GOBIN=$(pwd)/bin go install github.com/conductorone/terraform-provider-conductorone@<sha-or-simple-branch>
 ```
 
-The module path must be lowercase (`conductorone`) even though the GitHub URL uses mixed case — `go install` enforces the path declared in the upstream `go.mod`.
+Two gotchas:
+
+- The module path must be lowercase (`conductorone`) even though the GitHub URL uses mixed case — `go install` enforces the path declared in the upstream `go.mod`.
+- Branch names containing `/` (e.g. `fix/iga-1774-...`) are rejected by Go's module-version syntax (`invalid version: disallowed version string`). Resolve to a commit SHA with `git ls-remote https://github.com/ConductorOne/terraform-provider-conductorone.git refs/heads/<branch>` and pass that instead.
 
 This drops the binary in `./bin/terraform-provider-conductorone`. Point `dev.tfrc` at that directory:
 
