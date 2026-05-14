@@ -138,8 +138,10 @@ To test a branch or a PR from a fork, `git checkout` the relevant ref (or add th
 Terraform itself has no Git source for providers, but `go install` will fetch and build any branch or commit in one step:
 
 ```bash
-GOBIN=$(pwd)/bin go install github.com/ConductorOne/terraform-provider-conductorone@<branch-or-sha>
+GOBIN=$(pwd)/bin go install github.com/conductorone/terraform-provider-conductorone@<branch-or-sha>
 ```
+
+The module path must be lowercase (`conductorone`) even though the GitHub URL uses mixed case — `go install` enforces the path declared in the upstream `go.mod`.
 
 This drops the binary in `./bin/terraform-provider-conductorone`. Point `dev.tfrc` at that directory:
 
@@ -152,7 +154,7 @@ provider_installation {
 }
 ```
 
-Then run `TF_CLI_CONFIG_FILE=dev.tfrc terraform plan` as above. To pull from a fork, use its module path (e.g. `github.com/<user>/terraform-provider-conductorone@<branch>`) — this only works if the fork hasn't rewritten the Go module path.
+Then run `TF_CLI_CONFIG_FILE=dev.tfrc terraform plan` as above. Forks usually keep the upstream module path, so `go install github.com/<user>/...` will fail with a path mismatch — use the local-checkout flow for forks.
 
 ### Switching back to the registry version
 
