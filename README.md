@@ -98,10 +98,62 @@ See the full list of supported resources and data sources in the [ConductorOne p
 
 ## Using a local provider build
 
-To test against a locally-built provider binary instead of the registry version, create a `dev.tfrc` file with [dev overrides](https://developer.hashicorp.com/terraform/cli/config/config-file#development-overrides-for-provider-developers) and run:
+To test against a locally-built provider binary instead of the registry version, use Terraform's [development overrides](https://developer.hashicorp.com/terraform/cli/config/config-file#development-overrides-for-provider-developers).
+
+### From a local checkout
+
+1. Clone and build the provider:
+
+   ```bash
+   git clone https://github.com/ConductorOne/terraform-provider-conductorone.git
+   cd terraform-provider-conductorone
+   go build -o terraform-provider-conductorone
+   ```
+
+   Note the absolute path to the directory containing the binary (e.g. `/Users/you/src/terraform-provider-conductorone`).
+
+2. In this repo, create a `dev.tfrc` file pointing at that directory:
+
+   ```hcl
+   provider_installation {
+     dev_overrides {
+       "ConductorOne/conductorone" = "/absolute/path/to/terraform-provider-conductorone"
+     }
+     direct {}
+   }
+   ```
+
+3. Run Terraform with the override config:
+
+   ```bash
+   TF_CLI_CONFIG_FILE=dev.tfrc terraform plan
+   ```
+
+   No `terraform init` is needed — dev overrides bypass the registry and lock file. Terraform will print a warning confirming the override is in effect.
+
+To test a branch or a PR from a fork, `git checkout` the relevant ref (or add the fork as a remote with `git remote add fork https://github.com/<user>/terraform-provider-conductorone.git && git fetch fork`) before running `go build`.
+
+### From a remote GitHub branch via `go install`
+
+Terraform itself has no Git source for providers, but `go install` will fetch and build any branch or commit in one step:
 
 ```bash
-TF_CLI_CONFIG_FILE=dev.tfrc terraform plan
+GOBIN=$(pwd)/bin go install github.com/ConductorOne/terraform-provider-conductorone@<branch-or-sha>
 ```
 
-No `terraform init` is needed when using dev overrides.
+This drops the binary in `./bin/terraform-provider-conductorone`. Point `dev.tfrc` at that directory:
+
+```hcl
+provider_installation {
+  dev_overrides {
+    "ConductorOne/conductorone" = "/absolute/path/to/this/repo/bin"
+  }
+  direct {}
+}
+```
+
+Then run `TF_CLI_CONFIG_FILE=dev.tfrc terraform plan` as above. To pull from a fork, use its module path (e.g. `github.com/<user>/terraform-provider-conductorone@<branch>`) — this only works if the fork hasn't rewritten the Go module path.
+
+### Switching back to the registry version
+
+Unset the override by running Terraform without `TF_CLI_CONFIG_FILE`. If you've added or changed the `required_providers` version constraint, run `terraform init -upgrade` to refresh the lock file.
